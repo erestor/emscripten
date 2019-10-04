@@ -6,6 +6,9 @@
 
 // Create the main memory. (Note: this isn't used in STANDALONE_WASM mode since the wasm
 // memory is created in the wasm, not in JS.)
+
+var hasSharedArrayBuffer = typeof SharedArrayBuffer !== 'undefined';
+
 #if USE_PTHREADS
 if (ENVIRONMENT_IS_PTHREAD) {
   wasmMemory = Module['wasmMemory'];
@@ -32,11 +35,11 @@ if (ENVIRONMENT_IS_PTHREAD) {
 #endif // ALLOW_MEMORY_GROWTH
 #if USE_PTHREADS
       ,
-      'shared': true
+      'shared': hasSharedArrayBuffer
 #endif
     });
 #if USE_PTHREADS
-    if (!(wasmMemory.buffer instanceof SharedArrayBuffer)) {
+    if (!hasSharedArrayBuffer || !(wasmMemory.buffer instanceof SharedArrayBuffer)) {
       err('requested a shared WebAssembly.Memory but the returned buffer is not a SharedArrayBuffer, indicating that while the browser has SharedArrayBuffer it does not have WebAssembly threads support - you may need to set a flag');
       if (ENVIRONMENT_IS_NODE) {
         console.log('(on node you may need: --experimental-wasm-threads --experimental-wasm-bulk-memory and also use a recent version)');
@@ -46,6 +49,10 @@ if (ENVIRONMENT_IS_PTHREAD) {
 #endif
   }
 
+  else {
+    buffer = new ArrayBuffer(INITIAL_TOTAL_MEMORY);
+  }
+#endif // WASM
 #if USE_PTHREADS
 }
 #endif

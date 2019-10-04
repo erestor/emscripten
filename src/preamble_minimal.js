@@ -78,7 +78,7 @@ var wasmMemory = new WebAssembly.Memory({
   , 'maximum': wasmMaximumMemory
 #endif
 #if USE_PTHREADS
-  , 'shared': true
+  , 'shared': typeof SharedArrayBuffer !== 'undefined'
 #endif
   });
 
@@ -87,7 +87,9 @@ var buffer = wasmMemory.buffer;
 #if USE_PTHREADS
 }
 #if ASSERTIONS
+if (typeof SharedArrayBuffer !== 'undefined') {
 assert(buffer instanceof SharedArrayBuffer, 'requested a shared WebAssembly.Memory but the returned buffer is not a SharedArrayBuffer, indicating that while the browser has SharedArrayBuffer it does not have WebAssembly threads support - you may need to set a flag');
+}
 #endif
 #endif
 
