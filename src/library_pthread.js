@@ -519,6 +519,7 @@ var LibraryPThread = {
     if (ENVIRONMENT_IS_PTHREAD) throw 'Internal Error! spawnThread() can only ever be called from main application thread!';
 
     var worker = PThread.getNewWorker();
+    if (!worker) throw 'Internal error! No available worker for a new thread';
 
     if (worker.pthread !== undefined) throw 'Internal error!';
     if (!threadParams.pthread_ptr) throw 'Internal error, no pthread ptr!';
@@ -530,11 +531,6 @@ var LibraryPThread = {
     }
 
     var stackHigh = threadParams.stackBase + threadParams.stackSize;
-    var global_libc = _emscripten_get_global_libc();
-    var global_locale = global_libc + {{{ C_STRUCTS.libc.global_locale }}};
-
-    var worker = PThread.getNewWorker();
-    if (!worker) throw 'Internal error! No available worker for a new thread';
 
     var pthread = PThread.pthreads[threadParams.pthread_ptr] = { // Create a pthread info object to represent this thread.
       worker: worker,

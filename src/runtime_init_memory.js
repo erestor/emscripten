@@ -49,10 +49,6 @@ if (ENVIRONMENT_IS_PTHREAD) {
 #endif
   }
 
-  else {
-    buffer = new ArrayBuffer(INITIAL_TOTAL_MEMORY);
-  }
-#endif // WASM
 #if USE_PTHREADS
 }
 #endif
